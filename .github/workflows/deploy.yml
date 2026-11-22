@@ -25,6 +25,7 @@ jobs:
           mkdir _site
           unzip -q portfolio.zip -d _site
           test -f _site/index.html
+          python3 -c "from pathlib import Path; p=Path('_site/desktop/index.html'); p.write_text(p.read_text().replace('https://my.cbox.ws/maikeliya', 'https://www3.cbox.ws/box/?boxid=3562298&amp;boxtag=5D3Pns'))"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
