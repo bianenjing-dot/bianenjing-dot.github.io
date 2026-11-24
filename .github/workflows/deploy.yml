@@ -11,11 +11,8 @@ concurrency:
   group: pages
   cancel-in-progress: false
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
       - name: Reassemble and verify frozen website
@@ -24,12 +21,21 @@ jobs:
           sha256sum -c bundle.sha256
           mkdir _site
           unzip -q portfolio.zip -d _site
+          unzip -oq portfolio-update.zip -d _site
           test -f _site/index.html
-          python3 -c "from pathlib import Path; p=Path('_site/desktop/index.html'); p.write_text(p.read_text().replace('https://my.cbox.ws/maikeliya', 'https://www3.cbox.ws/box/?boxid=3562298&amp;boxtag=5D3Pns'))"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
           path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Allow artifact metadata to become available
+        run: sleep 15
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4
